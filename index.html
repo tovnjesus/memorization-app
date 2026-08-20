@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>암송앱</title>
+
+  <style>
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f5f7fa;
+      color: #222;
+    }
+
+    .container {
+      max-width: 500px;
+      margin: auto;
+      padding: 24px;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #777;
+      margin-bottom: 30px;
+    }
+
+    .verse-card {
+      background: white;
+      padding: 24px;
+      border-radius: 20px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    }
+
+    .week {
+      color: #5271ff;
+      font-weight: bold;
+      margin-bottom: 15px;
+    }
+
+    .verse {
+      font-size: 20px;
+      line-height: 1.7;
+      margin: 20px 0;
+    }
+
+    .reference {
+      text-align: right;
+      font-weight: bold;
+    }
+
+    button {
+      width: 100%;
+      padding: 15px;
+      margin-top: 15px;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    #adminButton {
+      background: #eeeeee;
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    #recordButton {
+      background: #5271ff;
+      color: white;
+    }
+
+    #recordButton.recording {
+      background: #e53935;
+    }
+
+    #completeButton {
+      background: #e8f5e9;
+      color: #2e7d32;
+    }
+
+    #completeButton:disabled {
+      background: #eeeeee;
+      color: #999;
+      cursor: not-allowed;
+    }
+
+    audio {
+      width: 100%;
+      margin-top: 20px;
+    }
+
+    #status {
+      text-align: center;
+      margin-top: 15px;
+      color: #666;
+    }
+
+    #completeMessage {
+      display: none;
+      text-align: center;
+      margin-top: 20px;
+      padding: 15px;
+      background: #e8f5e9;
+      color: #2e7d32;
+      border-radius: 12px;
+      font-weight: bold;
+    }
+
+    /* 관리자 화면 */
+
+    #adminPanel {
+      display: none;
+      background: white;
+      padding: 24px;
+      border-radius: 20px;
+      margin-top: 20px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    }
+
+    #adminPanel h2 {
+      margin-top: 0;
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 13px;
+      margin-top: 8px;
+      margin-bottom: 15px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      font-size: 16px;
+      font-family: inherit;
+    }
+
+    textarea {
+      min-height: 130px;
+      resize: vertical;
+      line-height: 1.6;
+    }
+
+    .save-button {
+      background: #5271ff;
+      color: white;
+    }
+
+    .close-button {
+      background: #eeeeee;
+      color: #333;
+    }
+
+    #adminStatus {
+      text-align: center;
+      color: #5271ff;
+      margin-top: 15px;
+    }
+
+  </style>
+
+</head>
+
+
+<body>
+
+<div class="container">
+
+  <h1>📖 암송앱</h1>
+
+  <button id="adminButton">
+    ⚙️ 관리자
+  </button>
+
+
+  <!-- 관리자 화면 -->
+
+  <div id="adminPanel">
+
+    <h2>⚙️ 관리자</h2>
+
+    <label>
+      암송 날짜
+    </label>
+
+    <input
+      type="date"
+      id="adminDate"
+    >
+
+
+    <label>
+      성경 구절
+    </label>
+
+    <input
+      type="text"
+      id="adminReference"
+      placeholder="예: 요한복음 3:16"
+    >
+
+
+    <label>
+      암송 내용
+    </label>
+
+    <textarea
+      id="adminVerse"
+      placeholder="암송할 말씀을 입력하세요."
+    ></textarea>
+
+
+    <button
+      class="save-button"
+      id="saveVerseButton"
+    >
+      💾 구절 저장
+    </button>
+
+
+    <button
+      class="close-button"
+      id="closeAdminButton"
+    >
+      닫기
+    </button>
+
+
+    <div id="adminStatus"></div>
+
+  </div>
+
+
+  <div class="subtitle">
+    이번 주 말씀을 암송해 보세요
+  </div>
+
+
+  <!-- 암송 화면 -->
+
+  <div class="verse-card">
+
+    <div
+      class="week"
+      id="weekText"
+    ></div>
+
+
+    <div
+      class="verse"
+      id="verseText"
+    ></div>
+
+
+    <div
+      class="reference"
+      id="verseReference"
+    ></div>
+
+
+    <button id="recordButton">
+      🎤 녹음 시작
+    </button>
+
+
+    <div id="status">
+      녹음 버튼을 눌러 암송을 녹음해 보세요.
+    </div>
+
+
+    <audio
+      id="audio"
+      controls
+    ></audio>
+
+
+    <button
+      id="completeButton"
+      disabled
+    >
+      ✅ 암송 완료
+    </button>
+
+
+    <div id="completeMessage">
+      🎉 이번 주 암송을 완료했습니다!
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- =========================
+     Supabase 라이브러리
+========================= -->
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+
+<script>
+
+/* =========================
+   Supabase 연결
+========================= */
+
+/*
+  아래 두 줄만 본인의 값으로 바꿔주세요.
+*/
+
+const SUPABASE_URL = "https://zqfzdbdhkkzamicdwonl.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpxZnpkYmRoa2t6YW1pY2R3b25sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcxNzM2OTksImV4cCI6MjEwMjc0OTY5OX0.TGBIE7jFHkMRQ-dMdei-wrS8XTUQPIpTW_84P8AeAMA";
+
+const supabaseClient = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
+
+
+
+
+/* =========================
+   기본 암송 구절
+========================= */
+
+const defaultVerses = [
+
+  {
+    week: "2026-08-23",
+
+    text:
+      "하나님이 세상을 이처럼 사랑하사 독생자를 주셨으니 이는 그를 믿는 자마다 멸망하지 않고 영생을 얻게 하려 하심이라",
+
+    reference:
+      "요한복음 3:16"
+  },
+
+  {
+    week: "2026-08-30",
+
+    text:
+      "여호와는 나의 목자시니 내게 부족함이 없으리로다",
+
+    reference:
+      "시편 23:1"
+  },
+
+  {
+    week: "2026-09-06",
+
+    text:
+      "내게 능력 주시는 자 안에서 내가 모든 것을 할 수 있느니라",
+
+    reference:
+      "빌립보서 4:13"
+  }
+
+];
+
+
+let savedVerses = [];
+
+
+/* =========================
+   오늘 날짜
+========================= */
+
+function getToday() {
+
+  const now = new Date();
+
+  const year =
+    now.getFullYear();
+
+  const month =
+    String(now.getMonth() + 1)
+      .padStart(2, "0");
+
+  const day =
+    String(now.getDate())
+      .padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+
+}
+
+
+/* =========================
+   Supabase에서 구절 가져오기
+========================= */
+
+async function loadVerses() {
+
+  try {
+
+    const result =
+      await supabaseClient
+        .from("verses")
+        .select("*")
+        .order("week", {
+          ascending: true
+        });
+
+
+    const data = result.data;
+
+    const error = result.error;
+
+
+    if (error) {
+
+      console.error(
+        "Supabase 오류:",
+        error
+      );
+
+      savedVerses =
+        defaultVerses;
+
+    }
+
+    else if (
+      data &&
+      data.length > 0
+    ) {
+
+      savedVerses =
+        data;
+
+      console.log(
+        "Supabase 구절:",
+        data
+      );
+
+    }
+
+    else {
+
+      savedVerses =
+        defaultVerses;
+
+    }
+
+
+    showVerse();
+
+
+    document
+      .getElementById("status")
+      .textContent =
+      "녹음 버튼을 눌러 암송을 녹음해 보세요.";
+
+  }
+
+  catch (error) {
+
+    console.error(
+      "Supabase 연결 오류:",
+      error
+    );
+
+
+    savedVerses =
+      defaultVerses;
+
+
+    showVerse();
+
+
+    document
+      .getElementById("status")
+      .textContent =
+      "녹음 버튼을 눌러 암송을 녹음해 보세요.";
+
+  }
+
+}
+
+
+/* =========================
+   현재 주차 구절 찾기
+========================= */
+
+function getCurrentVerse() {
+
+  const today =
+    getToday();
+
+  let current =
+    null;
+
+
+  savedVerses.forEach(
+    verse => {
+
+      if (
+        verse.week <= today
+      ) {
+
+        if (
+          !current ||
+          verse.week >
+          current.week
+        ) {
+
+          current =
+            verse;
+
+        }
+
+      }
+
+    }
+  );
+
+
+  /*
+    아직 오늘 이전 구절이 없으면
+    가장 가까운 첫 구절 표시
+  */
+
+  if (
+    !current &&
+    savedVerses.length > 0
+  ) {
+
+    current =
+      savedVerses[0];
+
+  }
+
+
+  return current;
+
+}
+
+
+/* =========================
+   화면에 구절 표시
+========================= */
+
+function showVerse() {
+
+  const verse =
+    getCurrentVerse();
+
+
+  if (!verse) {
+
+    document
+      .getElementById("weekText")
+      .textContent =
+      "📖 등록된 구절이 없습니다.";
+
+    return;
+
+  }
+
+
+  document
+    .getElementById("weekText")
+    .textContent =
+    "📅 " + verse.week;
+
+
+  document
+    .getElementById("verseText")
+    .textContent =
+    verse.text;
+
+
+  document
+    .getElementById("verseReference")
+    .textContent =
+    verse.reference;
+
+}
+
+
+/* =========================
+   앱 시작
+========================= */
+
+loadVerses();
+
+
+/* =========================
+   관리자 버튼
+========================= */
+
+document
+  .getElementById("adminButton")
+  .addEventListener(
+    "click",
+    () => {
+
+      const password =
+        prompt(
+          "관리자 비밀번호를 입력하세요."
+        );
+
+
+      if (
+        password === "1234"
+      ) {
+
+        document
+          .getElementById(
+            "adminPanel"
+          )
+          .style.display =
+          "block";
+
+      }
+
+      else {
+
+        alert(
+          "비밀번호가 올바르지 않습니다."
+        );
+
+      }
+
+    }
+  );
+
+
+/* =========================
+   관리자 닫기
+========================= */
+
+document
+  .getElementById(
+    "closeAdminButton"
+  )
+  .addEventListener(
+    "click",
+    () => {
+
+      document
+        .getElementById(
+          "adminPanel"
+        )
+        .style.display =
+        "none";
+
+    }
+  );
+
+
+/* =========================
+   관리자 구절 저장
+========================= */
+
+document
+  .getElementById(
+    "saveVerseButton"
+  )
+  .addEventListener(
+    "click",
+    async () => {
+
+
+      const date =
+        document
+          .getElementById(
+            "adminDate"
+          )
+          .value;
+
+
+      const reference =
+        document
+          .getElementById(
+            "adminReference"
+          )
+          .value
+          .trim();
+
+
+      const text =
+        document
+          .getElementById(
+            "adminVerse"
+          )
+          .value
+          .trim();
+
+
+      if (
+        !date ||
+        !reference ||
+        !text
+      ) {
+
+        alert(
+          "모든 항목을 입력해주세요."
+        );
+
+        return;
+
+      }
+
+
+      const adminStatus =
+        document
+          .getElementById(
+            "adminStatus"
+          );
+
+
+      adminStatus.textContent =
+        "☁️ 저장 중...";
+
+
+      try {
+
+        const result =
+          await supabaseClient
+            .from("verses")
+            .upsert(
+              {
+                week: date,
+                reference: reference,
+                text: text
+              },
+              {
+                onConflict: "week"
+              }
+            );
+
+
+        if (result.error) {
+
+          throw result.error;
+
+        }
+
+
+        adminStatus.textContent =
+          "✅ 온라인에 저장되었습니다.";
+
+
+        /*
+          저장한 뒤
+          Supabase에서 다시 불러오기
+        */
+
+        await loadVerses();
+
+
+        document
+          .getElementById(
+            "adminDate"
+          )
+          .value = "";
+
+
+        document
+          .getElementById(
+            "adminReference"
+          )
+          .value = "";
+
+
+        document
+          .getElementById(
+            "adminVerse"
+          )
+          .value = "";
+
+
+      }
+
+      catch (error) {
+
+        console.error(
+          "구절 저장 오류:",
+          error
+        );
+
+
+        adminStatus.textContent =
+          "❌ 저장하지 못했습니다. Supabase 설정을 확인해주세요.";
+
+      }
+
+    }
+  );
+
+
+/* =========================
+   녹음 기능
+========================= */
+
+let mediaRecorder;
+
+let audioChunks = [];
+
+
+const recordButton =
+  document.getElementById(
+    "recordButton"
+  );
+
+
+const audio =
+  document.getElementById(
+    "audio"
+  );
+
+
+const status =
+  document.getElementById(
+    "status"
+  );
+
+
+const completeButton =
+  document.getElementById(
+    "completeButton"
+  );
+
+
+const completeMessage =
+  document.getElementById(
+    "completeMessage"
+  );
+
+
+recordButton.addEventListener(
+  "click",
+  async () => {
+
+
+    /*
+      녹음 시작
+    */
+
+    if (
+      !mediaRecorder ||
+      mediaRecorder.state ===
+      "inactive"
+    ) {
+
+      try {
+
+        const stream =
+          await navigator
+            .mediaDevices
+            .getUserMedia({
+              audio: true
+            });
+
+
+        mediaRecorder =
+          new MediaRecorder(
+            stream
+          );
+
+
+        audioChunks = [];
+
+
+        mediaRecorder
+          .ondataavailable =
+          event => {
+
+            if (
+              event.data.size > 0
+            ) {
+
+              audioChunks.push(
+                event.data
+              );
+
+            }
+
+          };
+
+
+        mediaRecorder.onstop =
+          () => {
+
+            const audioBlob =
+              new Blob(
+                audioChunks,
+                {
+                  type:
+                    "audio/webm"
+                }
+              );
+
+
+            const audioURL =
+              URL.createObjectURL(
+                audioBlob
+              );
+
+
+            audio.src =
+              audioURL;
+
+
+            completeButton
+              .disabled =
+              false;
+
+
+            status.textContent =
+              "녹음이 완료되었습니다. 다시 들어보세요.";
+
+          };
+
+
+        mediaRecorder.start();
+
+
+        recordButton.textContent =
+          "⏹️ 녹음 종료";
+
+
+        recordButton
+          .classList
+          .add(
+            "recording"
+          );
+
+
+        status.textContent =
+          "🔴 녹음 중입니다. 암송해 주세요.";
+
+      }
+
+      catch (error) {
+
+        console.error(
+          error
+        );
+
+
+        status.textContent =
+          "⚠️ 마이크 사용 권한이 필요합니다.";
+
+      }
+
+    }
+
+
+    /*
+      녹음 종료
+    */
+
+    else if (
+      mediaRecorder.state ===
+      "recording"
+    ) {
+
+      mediaRecorder.stop();
+
+
+      recordButton.textContent =
+        "🎤 다시 녹음";
+
+
+      recordButton
+        .classList
+        .remove(
+          "recording"
+        );
+
+    }
+
+  }
+);
+
+
+/* =========================
+   암송 완료
+========================= */
+
+completeButton.addEventListener(
+  "click",
+  () => {
+
+    completeMessage.style.display =
+      "block";
+
+
+    completeButton.textContent =
+      "✅ 암송 완료됨";
+
+
+    completeButton.disabled =
+      true;
+
+
+    status.textContent =
+      "이번 주 암송이 완료되었습니다!";
+
+  }
+);
+
+</script>
+
+</body>
+</html>
