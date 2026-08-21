@@ -4,11 +4,20 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+  <link rel="manifest" href="/manifest.json">
+
   <title>암송앱</title>
 
   <style>
 
+  
     body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f5f7fa;
+    color: #222;
+  }
+    {
       margin: 0;
       font-family: Arial, sans-serif;
       background: #f5f7fa;
@@ -70,6 +79,16 @@
       color: #333;
       margin-bottom: 20px;
     }
+
+<label for="userName">이름</label>
+
+<input
+  type="text"
+  id="userName"
+  placeholder="이름을 입력해주세요"
+  maxlength="20"
+>
+
 
     #recordButton {
       background: #5271ff;
@@ -172,7 +191,7 @@
 
 <div class="container">
 
-  <h1>📖 암송앱</h1>
+  <h1>📖 아장교회 초등부 암송앱</h1>
 
   <button id="adminButton">
     ⚙️ 관리자
@@ -252,10 +271,19 @@
     ></div>
 
 
-    <div
-      class="verse"
-      id="verseText"
-    ></div>
+   <div id="verseDisplay">
+
+  <div
+    class="verse"
+    id="verseText"
+  ></div>
+
+  <div
+    class="reference"
+    id="verseReference"
+  ></div>
+
+</div>
 
 
     <div
@@ -264,9 +292,20 @@
     ></div>
 
 
+
+    <label for="userName">이름</label>
+
+<input
+  type="text"
+  id="userName"
+  placeholder="이름을 입력해주세요"
+  maxlength="20"
+>
+
     <button id="recordButton">
       🎤 녹음 시작
     </button>
+
 
 
     <div id="status">
@@ -800,126 +839,176 @@ document
 ========================= */
 
 let mediaRecorder;
-
 let audioChunks = [];
-
+let currentAudioBlob = null;
 
 const recordButton =
-  document.getElementById(
-    "recordButton"
-  );
-
+  document.getElementById("recordButton");
 
 const audio =
-  document.getElementById(
-    "audio"
-  );
-
+  document.getElementById("audio");
 
 const status =
-  document.getElementById(
-    "status"
-  );
-
+  document.getElementById("status");
 
 const completeButton =
-  document.getElementById(
-    "completeButton"
-  );
-
+  document.getElementById("completeButton");
 
 const completeMessage =
-  document.getElementById(
-    "completeMessage"
-  );
+  document.getElementById("completeMessage");
+
+const verseDisplay =
+  document.getElementById("verseDisplay");
 
 
 recordButton.addEventListener(
   "click",
   async () => {
 
-
-    /*
-      녹음 시작
-    */
+    /* =========================
+       녹음 시작
+    ========================= */
 
     if (
       !mediaRecorder ||
-      mediaRecorder.state ===
-      "inactive"
+      mediaRecorder.state === "inactive"
     ) {
 
       try {
 
         const stream =
-          await navigator
-            .mediaDevices
-            .getUserMedia({
-              audio: true
-            });
-
+          await navigator.mediaDevices.getUserMedia({
+            audio: true
+          });
 
         mediaRecorder =
-          new MediaRecorder(
-            stream
-          );
-
+          new MediaRecorder(stream);
 
         audioChunks = [];
 
-
-        mediaRecorder
-          .ondataavailable =
+        mediaRecorder.ondataavailable =
           event => {
 
-            if (
-              event.data.size > 0
-            ) {
-
-              audioChunks.push(
-                event.data
-              );
-
+            if (event.data.size > 0) {
+              audioChunks.push(event.data);
             }
 
           };
 
 
         mediaRecorder.onstop =
-          () => {
+          async () => {
 
-            const audioBlob =
+            /* 녹음 파일 만들기 */
+
+            currentAudioBlob =
               new Blob(
                 audioChunks,
                 {
-                  type:
-                    "audio/webm"
+                  type: "audio/webm"
                 }
               );
 
 
+            /* 브라우저에서 재생 */
+
             const audioURL =
               URL.createObjectURL(
-                audioBlob
+                currentAudioBlob
               );
 
-
-            audio.src =
-              audioURL;
+            audio.src = audioURL;
 
 
-            completeButton
-              .disabled =
-              false;
+            /* 마이크 종료 */
+
+            stream.getTracks().forEach(
+              track => track.stop()
+            );
 
 
             status.textContent =
-              "녹음이 완료되었습니다. 다시 들어보세요.";
+              "☁️ 녹음 파일을 저장하는 중입니다...";
+
+
+            /* =========================
+               Supabase Storage 업로드
+            ========================= */
+
+            try {
+
+              const fileName =
+                `recording_${Date.now()}.webm`;
+
+
+              const filePath =
+                `recordings/${fileName}`;
+
+
+              const uploadResult =
+                await supabaseClient
+                  .storage
+                  .from("recordings")
+                  .upload(
+                    fileName,
+                    currentAudioBlob,
+                    {
+                      contentType:
+                        "audio/webm",
+                      upsert: false
+                    }
+                  );
+
+
+              if (uploadResult.error) {
+                throw uploadResult.error;
+              }
+
+
+              console.log(
+                "녹음 업로드 성공:",
+                uploadResult.data
+              );
+
+
+              status.textContent =
+                "✅ 녹음이 저장되었습니다. 들어보고 암송 완료를 눌러주세요.";
+
+
+              completeButton.disabled =
+                false;
+
+
+            }
+
+            catch (error) {
+
+              console.error(
+                "녹음 업로드 오류:",
+                error
+              );
+
+
+              status.textContent =
+                "❌ 녹음 저장에 실패했습니다.";
+
+
+              completeButton.disabled =
+                true;
+
+            }
 
           };
 
 
         mediaRecorder.start();
+
+
+        /* 말씀 숨기기 */
+
+        document
+          .getElementById("verseDisplay")
+          .style.display = "none";
 
 
         recordButton.textContent =
@@ -928,9 +1017,7 @@ recordButton.addEventListener(
 
         recordButton
           .classList
-          .add(
-            "recording"
-          );
+          .add("recording");
 
 
         status.textContent =
@@ -940,10 +1027,7 @@ recordButton.addEventListener(
 
       catch (error) {
 
-        console.error(
-          error
-        );
-
+        console.error(error);
 
         status.textContent =
           "⚠️ 마이크 사용 권한이 필요합니다.";
@@ -953,13 +1037,12 @@ recordButton.addEventListener(
     }
 
 
-    /*
-      녹음 종료
-    */
+    /* =========================
+       녹음 종료
+    ========================= */
 
     else if (
-      mediaRecorder.state ===
-      "recording"
+      mediaRecorder.state === "recording"
     ) {
 
       mediaRecorder.stop();
@@ -971,9 +1054,7 @@ recordButton.addEventListener(
 
       recordButton
         .classList
-        .remove(
-          "recording"
-        );
+        .remove("recording");
 
     }
 
@@ -988,6 +1069,11 @@ recordButton.addEventListener(
 completeButton.addEventListener(
   "click",
   () => {
+
+    document
+      .getElementById("verseDisplay")
+      .style.display = "block";
+
 
     completeMessage.style.display =
       "block";
@@ -1007,7 +1093,50 @@ completeButton.addEventListener(
   }
 );
 
-</script>
 
+
+/* =========================
+   암송 완료
+========================= */
+
+completeButton.addEventListener(
+  "click",
+  () => {
+
+document.getElementById("verseDisplay").style.display = "block";
+
+
+    completeMessage.style.display =
+      "block";
+
+
+    completeButton.textContent =
+      "✅ 암송 완료됨";
+
+
+    completeButton.disabled =
+      true;
+
+
+    status.textContent =
+      "이번 주 암송이 완료되었습니다!";
+
+  }
+);
+
+
+
+    if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+            navigator.serviceWorker.register("./service-worker.js")
+                .then(() => {
+                    console.log("Service Worker 등록 완료");
+                })
+                .catch(error => {
+                    console.error("Service Worker 등록 실패:", error);
+                });
+        });
+    }
+</script>
 </body>
 </html>
