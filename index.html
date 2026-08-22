@@ -191,8 +191,7 @@
 
 <div class="container">
 
-  <h1>📖 아장교회 초등부 
-    암송앱</h1>
+  <h1>📖 아장교회 초등부 암송앱</h1>
 
   <button id="adminButton">
     ⚙️ 관리자
@@ -938,9 +937,27 @@ recordButton.addEventListener(
 
             try {
 
-              const fileName =
-                `recording_${Date.now()}.webm`;
+             const userName =
+  document.getElementById("userName")
+    .value
+    .trim();
 
+const currentVerse =
+  getCurrentVerse();
+
+const verseWeek =
+  currentVerse
+    ? currentVerse.week
+    : getToday();
+
+const safeUserName =
+  userName.replace(
+    /[\\/:*?"<>|]/g,
+    "_"
+  );
+
+const fileName =
+  `${safeUserName}_${verseWeek}_${Date.now()}.webm`;
 
               const filePath =
                 `recordings/${fileName}`;
