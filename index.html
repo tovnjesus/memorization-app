@@ -937,18 +937,10 @@ recordButton.addEventListener(
 
             try {
 
-             const userName =
+              const userName =
   document.getElementById("userName")
     .value
     .trim();
-
-const currentVerse =
-  getCurrentVerse();
-
-const verseWeek =
-  currentVerse
-    ? currentVerse.week
-    : getToday();
 
 const safeUserName =
   userName.replace(
@@ -957,36 +949,37 @@ const safeUserName =
   );
 
 const fileName =
-  `${safeUserName}_${verseWeek}_${Date.now()}.webm`;
-
-              const filePath =
-                `recordings/${fileName}`;
+  `recording_${Date.now()}.webm`;
 
 
-              const uploadResult =
-                await supabaseClient
-                  .storage
-                  .from("recordings")
-                  .upload(
-                    fileName,
-                    currentAudioBlob,
-                    {
-                      contentType:
-                        "audio/webm",
-                      upsert: false
-                    }
-                  );
+const filePath =
+  `recordings/${fileName}`;
 
 
-              if (uploadResult.error) {
-                throw uploadResult.error;
-              }
+const uploadResult =
+  await supabaseClient
+    .storage
+    .from("recordings")
+    .upload(
+      fileName,
+      currentAudioBlob,
+      {
+        contentType:
+          "audio/webm",
+        upsert: false
+      }
+    );
 
 
-              console.log(
-                "녹음 업로드 성공:",
-                uploadResult.data
-              );
+if (uploadResult.error) {
+  throw uploadResult.error;
+}
+
+
+console.log(
+  "녹음 업로드 성공:",
+  uploadResult.data
+);
 
 
               status.textContent =
