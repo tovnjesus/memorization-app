@@ -1,23 +1,25 @@
 <!DOCTYPE html>
 <html lang="ko">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <link rel="manifest" href="/manifest.json">
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <link
+    rel="manifest"
+    href="/manifest.json"
+  >
 
   <title>암송앱</title>
 
   <style>
 
-  
     body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: #f5f7fa;
-    color: #222;
-  }
-    {
       margin: 0;
       font-family: Arial, sans-serif;
       background: #f5f7fa;
@@ -80,16 +82,6 @@
       margin-bottom: 20px;
     }
 
-<label for="userName">이름</label>
-
-<input
-  type="text"
-  id="userName"
-  placeholder="이름을 입력해주세요"
-  maxlength="20"
->
-
-
     #recordButton {
       background: #5271ff;
       color: white;
@@ -110,11 +102,6 @@
       cursor: not-allowed;
     }
 
-    audio {
-      width: 100%;
-      margin-top: 20px;
-    }
-
     #status {
       text-align: center;
       margin-top: 15px;
@@ -132,7 +119,13 @@
       font-weight: bold;
     }
 
-    /* 관리자 화면 */
+    #video {
+      width: 100%;
+      margin-top: 20px;
+      border-radius: 12px;
+      background: #000;
+      display: none;
+    }
 
     #adminPanel {
       display: none;
@@ -182,6 +175,36 @@
       margin-top: 15px;
     }
 
+    .recording-item {
+      background: #f5f7fa;
+      padding: 15px;
+      border-radius: 12px;
+      margin-bottom: 15px;
+    }
+
+    .recording-name {
+      font-weight: bold;
+      font-size: 17px;
+    }
+
+    .recording-date {
+      margin-top: 5px;
+      color: #666;
+    }
+
+    .recording-video {
+      width: 100%;
+      margin-top: 12px;
+      border-radius: 10px;
+      background: #000;
+    }
+
+    .delete-button {
+      background: #e53935;
+      color: white;
+      margin-top: 12px;
+    }
+
   </style>
 
 </head>
@@ -193,16 +216,20 @@
 
   <h1>📖 아장교회 초등부 암송앱</h1>
 
+
   <button id="adminButton">
     ⚙️ 관리자
   </button>
 
 
-  <!-- 관리자 화면 -->
+  <!-- =========================
+       관리자 화면
+  ========================= -->
 
   <div id="adminPanel">
 
     <h2>⚙️ 관리자</h2>
+
 
     <label>
       암송 날짜
@@ -249,19 +276,54 @@
     >
       닫기
     </button>
+<button
+  class="close-button"
+  id="logoutAdminButton"
+  style="display:none;"
+>
+
+
+  🚪 관리자 로그아웃
+</button>
+
+
+
+
+
+
+
 
 
     <div id="adminStatus"></div>
 
+
+    <hr
+      style="
+        margin:30px 0;
+        border:none;
+        border-top:1px solid #eee;
+      "
+    >
+
+
+    <h2>📹 암송 영상 확인</h2>
+
+
+    <div id="recordingList">
+      영상을 불러오는 중입니다...
+    </div>
+
   </div>
 
+
+  <!-- =========================
+       암송 화면
+  ========================= -->
 
   <div class="subtitle">
     이번 주 말씀을 암송해 보세요
   </div>
 
-
-  <!-- 암송 화면 -->
 
   <div class="verse-card">
 
@@ -271,29 +333,24 @@
     ></div>
 
 
-   <div id="verseDisplay">
+    <div id="verseDisplay">
 
-  <div
-    class="verse"
-    id="verseText"
-  ></div>
+      <div
+        class="verse"
+        id="verseText"
+      ></div>
 
-  <div
-    class="reference"
-    id="verseReference"
-  ></div>
+      <div
+        class="reference"
+        id="verseReference"
+      ></div>
 
-</div>
-
-
-    <div
-      class="reference"
-      id="verseReference"
-    ></div>
+    </div>
 
 
-
-    <label for="userName">이름</label>
+    <label for="userName">
+  이름
+</label>
 
 <input
   type="text"
@@ -302,21 +359,55 @@
   maxlength="20"
 >
 
+<label for="className">
+  반
+</label>
+
+<select
+  id="className"
+  style="
+    width:100%;
+    box-sizing:border-box;
+    padding:13px;
+    margin-top:8px;
+    margin-bottom:15px;
+    border:1px solid #ddd;
+    border-radius:10px;
+    font-size:16px;
+    background:white;
+  "
+>
+  <option value="">반을 선택해주세요</option>
+  <option value="R1&2">R1&2</option>
+  <option value="R3">R3</option>
+  <option value="R4">R4</option>
+  <option value="R5">R5</option>
+  <option value="R6">R6</option>
+  <option value="R7">R7</option>
+  <option value="R8">R8</option>
+  <option value="R9">R9</option>
+  <option value="R10">R10</option>
+  <option value="R11">R11</option>
+  <option value="R12">R12</option>
+</select>
+
+
+
     <button id="recordButton">
-      🎤 녹음 시작
+      🟢 테스트 동영상 버튼
     </button>
 
 
-
     <div id="status">
-      녹음 버튼을 눌러 암송을 녹음해 보세요.
+      동영상 촬영 버튼을 눌러 암송을 촬영해 보세요.
     </div>
 
 
-    <audio
-      id="audio"
+    <video
+      id="video"
       controls
-    ></audio>
+      playsinline
+    ></video>
 
 
     <button
@@ -337,7 +428,7 @@
 
 
 <!-- =========================
-     Supabase 라이브러리
+     Supabase
 ========================= -->
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -345,57 +436,65 @@
 
 <script>
 
-/* =========================
+/* ==================================================
    Supabase 연결
-========================= */
+================================================== */
 
-/*
-  아래 두 줄만 본인의 값으로 바꿔주세요.
-*/
+const SUPABASE_URL =
+  "https://zqfzdbdhkkzamicdwonl.supabase.co";
 
-const SUPABASE_URL = "https://zqfzdbdhkkzamicdwonl.supabase.co";
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpxZnpkYmRoa2t6YW1pY2R3b25sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcxNzM2OTksImV4cCI6MjEwMjc0OTY5OX0.TGBIE7jFHkMRQ-dMdei-wrS8XTUQPIpTW_84P8AeAMA";
+const SUPABASE_KEY =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpxZnpkYmRoa2t6YW1pY2R3b25sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcxNzM2OTksImV4cCI6MjEwMjc0OTY5OX0.TGBIE7jFHkMRQ-dMdei-wrS8XTUQPIpTW_84P8AeAMA";
 
-const supabaseClient = window.supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_KEY
-);
-
-
+const supabaseClient =
+  window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
 
 
-/* =========================
+supabaseClient.auth.getSession()
+  .then(({ data, error }) => {
+
+    console.log(
+      "현재 Supabase 세션:",
+      data.session
+    );
+
+    console.log(
+      "세션 확인 오류:",
+      error
+    );
+
+  });
+
+
+/* ==================================================
    기본 암송 구절
-========================= */
+================================================== */
 
 const defaultVerses = [
 
   {
     week: "2026-08-23",
-
     text:
       "하나님이 세상을 이처럼 사랑하사 독생자를 주셨으니 이는 그를 믿는 자마다 멸망하지 않고 영생을 얻게 하려 하심이라",
-
     reference:
       "요한복음 3:16"
   },
 
   {
     week: "2026-08-30",
-
     text:
       "여호와는 나의 목자시니 내게 부족함이 없으리로다",
-
     reference:
       "시편 23:1"
   },
 
   {
     week: "2026-09-06",
-
     text:
       "내게 능력 주시는 자 안에서 내가 모든 것을 할 수 있느니라",
-
     reference:
       "빌립보서 4:13"
   }
@@ -406,33 +505,36 @@ const defaultVerses = [
 let savedVerses = [];
 
 
-/* =========================
+/* ==================================================
    오늘 날짜
-========================= */
+================================================== */
 
 function getToday() {
 
-  const now = new Date();
+  const now =
+    new Date();
 
   const year =
     now.getFullYear();
 
   const month =
-    String(now.getMonth() + 1)
-      .padStart(2, "0");
+    String(
+      now.getMonth() + 1
+    ).padStart(2, "0");
 
   const day =
-    String(now.getDate())
-      .padStart(2, "0");
+    String(
+      now.getDate()
+    ).padStart(2, "0");
 
   return `${year}-${month}-${day}`;
 
 }
 
 
-/* =========================
+/* ==================================================
    Supabase에서 구절 가져오기
-========================= */
+================================================== */
 
 async function loadVerses() {
 
@@ -442,21 +544,19 @@ async function loadVerses() {
       await supabaseClient
         .from("verses")
         .select("*")
-        .order("week", {
-          ascending: true
-        });
+        .order(
+          "week",
+          {
+            ascending: true
+          }
+        );
 
 
-    const data = result.data;
-
-    const error = result.error;
-
-
-    if (error) {
+    if (result.error) {
 
       console.error(
         "Supabase 오류:",
-        error
+        result.error
       );
 
       savedVerses =
@@ -465,16 +565,16 @@ async function loadVerses() {
     }
 
     else if (
-      data &&
-      data.length > 0
+      result.data &&
+      result.data.length > 0
     ) {
 
       savedVerses =
-        data;
+        result.data;
 
       console.log(
         "Supabase 구절:",
-        data
+        result.data
       );
 
     }
@@ -493,7 +593,7 @@ async function loadVerses() {
     document
       .getElementById("status")
       .textContent =
-      "녹음 버튼을 눌러 암송을 녹음해 보세요.";
+      "동영상 촬영 버튼을 눌러 암송을 촬영해 보세요.";
 
   }
 
@@ -504,27 +604,19 @@ async function loadVerses() {
       error
     );
 
-
     savedVerses =
       defaultVerses;
 
-
     showVerse();
-
-
-    document
-      .getElementById("status")
-      .textContent =
-      "녹음 버튼을 눌러 암송을 녹음해 보세요.";
 
   }
 
 }
 
 
-/* =========================
-   현재 주차 구절 찾기
-========================= */
+/* ==================================================
+   현재 주차 구절
+================================================== */
 
 function getCurrentVerse() {
 
@@ -544,8 +636,7 @@ function getCurrentVerse() {
 
         if (
           !current ||
-          verse.week >
-          current.week
+          verse.week > current.week
         ) {
 
           current =
@@ -558,11 +649,6 @@ function getCurrentVerse() {
     }
   );
 
-
-  /*
-    아직 오늘 이전 구절이 없으면
-    가장 가까운 첫 구절 표시
-  */
 
   if (
     !current &&
@@ -580,9 +666,9 @@ function getCurrentVerse() {
 }
 
 
-/* =========================
+/* ==================================================
    화면에 구절 표시
-========================= */
+================================================== */
 
 function showVerse() {
 
@@ -622,46 +708,151 @@ function showVerse() {
 }
 
 
-/* =========================
-   앱 시작
-========================= */
-
-loadVerses();
-
-
-/* =========================
-   관리자 버튼
-========================= */
+/* ==================================================
+   관리자 로그인
+================================================== */
 
 document
   .getElementById("adminButton")
   .addEventListener(
     "click",
-    () => {
+    async () => {
+
+      const email =
+        prompt(
+          "관리자 이메일을 입력하세요."
+        );
+
+      if (!email) {
+        return;
+      }
+
 
       const password =
         prompt(
           "관리자 비밀번호를 입력하세요."
         );
 
+      if (!password) {
+        return;
+      }
 
-      if (
-        password === "1234"
-      ) {
 
-        document
-          .getElementById(
-            "adminPanel"
-          )
-          .style.display =
-          "block";
+      try {
+
+        const result =
+          await supabaseClient.auth.signInWithPassword({
+            email:
+              email.trim(),
+
+            password:
+              password
+          });
+
+
+        if (result.error) {
+
+          console.error(
+            "관리자 로그인 오류:",
+            result.error
+          );
+
+          alert(
+            "❌ 이메일 또는 비밀번호가 올바르지 않습니다."
+          );
+
+          return;
+
+        }
+
+
+const { data: roleData, error: roleError } =
+  await supabaseClient
+    .from("admin_roles")
+    .select("role")
+    .eq("user_id", result.data.user.id)
+    .maybeSingle();
+
+console.log(
+  "관리자 권한 확인:",
+  roleData,
+  roleError
+);
+
+if (roleError) {
+
+  console.error(
+    "관리자 권한 조회 오류:",
+    roleError
+  );
+
+  alert(
+    "❌ 관리자 권한을 확인할 수 없습니다.\n\n" +
+    roleError.message
+  );
+
+  return;
+
+}
+
+if (
+  !roleData ||
+  !roleData.role
+) {
+
+  await supabaseClient.auth.signOut();
+
+  alert(
+    "❌ 관리자 권한이 등록되지 않은 계정입니다."
+  );
+
+  return;
+
+}
+
+console.log(
+  "관리자 로그인 성공:",
+  roleData.role
+);
+
+document
+  .getElementById("adminPanel")
+  .style.display =
+  "block";
+
+document
+  .getElementById("logoutAdminButton")
+  .style.display =
+  "block";
+
+await loadRecordingList();
+
+
+document
+  .getElementById("adminPanel")
+  .style.display =
+  "block";
+
+document
+  .getElementById("logoutAdminButton")
+  .style.display =
+  "block";
+
+await loadRecordingList();
+
+
 
       }
 
-      else {
+      catch (error) {
+
+        console.error(
+          "관리자 로그인 오류:",
+          error
+        );
 
         alert(
-          "비밀번호가 올바르지 않습니다."
+          "❌ 관리자 로그인에 실패했습니다."
         );
 
       }
@@ -670,64 +861,448 @@ document
   );
 
 
-/* =========================
+/* ==================================================
    관리자 닫기
-========================= */
+================================================== */
 
 document
-  .getElementById(
-    "closeAdminButton"
-  )
+  .getElementById("closeAdminButton")
   .addEventListener(
     "click",
     () => {
 
       document
-        .getElementById(
-          "adminPanel"
-        )
+        .getElementById("adminPanel")
         .style.display =
         "none";
 
     }
   );
 
-
-/* =========================
-   관리자 구절 저장
-========================= */
-
 document
-  .getElementById(
-    "saveVerseButton"
-  )
+  .getElementById("logoutAdminButton")
   .addEventListener(
     "click",
     async () => {
 
+      await supabaseClient.auth.signOut();
+
+      document
+        .getElementById("adminPanel")
+        .style.display =
+        "none";
+
+      document
+        .getElementById("logoutAdminButton")
+        .style.display =
+        "none";
+
+      alert(
+        "✅ 관리자 로그아웃되었습니다."
+      );
+
+    }
+  );
+
+
+
+/* ==================================================
+   관리자 암송 영상 불러오기
+================================================== */
+
+async function loadRecordingList() {
+
+  const recordingList =
+    document.getElementById(
+      "recordingList"
+    );
+
+
+  recordingList.textContent =
+    "☁️ 영상을 불러오는 중입니다...";
+
+
+  try {
+
+    const result =
+      await supabaseClient
+        .from("recordings_logs")
+        .select("*")
+        .order(
+          "created_at",
+          {
+            ascending: false
+          }
+        );
+
+
+    if (result.error) {
+
+      throw result.error;
+
+    }
+
+
+    const recordings =
+      result.data;
+
+
+    if (
+      !recordings ||
+      recordings.length === 0
+    ) {
+
+      recordingList.innerHTML =
+        "<p>📭 아직 등록된 암송 영상이 없습니다.</p>";
+
+      return;
+
+    }
+
+
+    recordingList.innerHTML =
+      "";
+
+
+    /* ==============================================
+       영상 목록
+    ============================================== */
+
+    for (
+      const recording of recordings
+    ) {
+
+      const item =
+        document.createElement(
+          "div"
+        );
+
+      item.className =
+        "recording-item";
+
+
+      /* ============================================
+         이름
+      ============================================ */
+
+      const name =
+        document.createElement(
+          "div"
+        );
+
+      name.className =
+        "recording-name";
+
+      name.textContent =
+        "👤 " +
+        (
+          recording.user_name ||
+          "이름 없음"
+        );
+
+
+      /* ============================================
+         날짜
+      ============================================ */
+
+      const date =
+        document.createElement(
+          "div"
+        );
+
+      date.className =
+        "recording-date";
+
+      date.textContent =
+        "📅 " +
+        (
+          recording.week ||
+          "-"
+        );
+
+
+      /* ============================================
+         Signed URL
+      ============================================ */
+
+      const signedResult =
+        await supabaseClient
+          .storage
+          .from("recordings")
+          .createSignedUrl(
+            recording.file_name,
+            3600
+          );
+
+
+      /* ============================================
+         영상이 이미 삭제된 경우
+         
+         DB 기록은 남아 있지만 Storage 파일이
+         없는 경우입니다.
+         
+         오류 문구를 표시하지 않고
+         해당 기록만 건너뜁니다.
+      ============================================ */
+
+      if (signedResult.error) {
+
+        console.warn(
+          "Storage에 영상이 없어 건너뜁니다:",
+          recording.file_name
+        );
+
+        continue;
+
+      }
+
+
+      /* ============================================
+         영상
+      ============================================ */
+
+      const video =
+        document.createElement(
+          "video"
+        );
+
+      video.className =
+        "recording-video";
+
+      video.controls =
+        true;
+
+      video.playsInline =
+        true;
+
+      video.src =
+        signedResult.data.signedUrl;
+
+
+      /* ============================================
+         삭제 버튼
+      ============================================ */
+
+      const deleteButton =
+        document.createElement(
+          "button"
+        );
+
+      deleteButton.className =
+        "delete-button";
+
+      deleteButton.textContent =
+        "🗑️ 영상 삭제";
+
+
+      deleteButton.addEventListener(
+        "click",
+        async () => {
+
+          const confirmed =
+            confirm(
+              "이 암송 영상을 삭제하시겠습니까?\n\n삭제하면 복구할 수 없습니다."
+            );
+
+
+          if (!confirmed) {
+
+            return;
+
+          }
+
+
+          deleteButton.disabled =
+            true;
+
+          deleteButton.textContent =
+            "⏳ 삭제 중...";
+
+
+          try {
+
+            /* ====================================
+               Storage 파일 삭제
+            ==================================== */
+
+            const removeResult =
+              await supabaseClient
+                .storage
+                .from("recordings")
+                .remove([
+                  recording.file_name
+                ]);
+
+
+            if (
+              removeResult.error
+            ) {
+
+              throw removeResult.error;
+
+            }
+
+
+            /* ====================================
+               recordings_logs 기록 삭제
+            ==================================== */
+
+            const deleteResult =
+              await supabaseClient
+                .from("recordings_logs")
+                .delete()
+                .eq(
+                  "id",
+                  recording.id
+                );
+
+
+            if (
+              deleteResult.error
+            ) {
+
+              throw deleteResult.error;
+
+            }
+
+
+            /* ====================================
+               화면에서 제거
+            ==================================== */
+
+            item.remove();
+
+
+            alert(
+              "✅ 영상이 삭제되었습니다."
+            );
+
+
+            if (
+              recordingList.children.length === 0
+            ) {
+
+              recordingList.innerHTML =
+                "<p>📭 아직 등록된 암송 영상이 없습니다.</p>";
+
+            }
+
+          }
+
+          catch (error) {
+
+            console.error(
+              "영상 삭제 오류:",
+              error
+            );
+
+
+            deleteButton.disabled =
+              false;
+
+            deleteButton.textContent =
+              "🗑️ 영상 삭제";
+
+
+            alert(
+              "❌ 영상 삭제에 실패했습니다.\n\nSupabase 삭제 권한을 확인해주세요."
+            );
+
+          }
+
+        }
+      );
+
+
+      /* ==========================================
+         화면에 추가
+      ========================================== */
+
+      item.appendChild(
+        name
+      );
+
+      item.appendChild(
+        date
+      );
+
+      item.appendChild(
+        video
+      );
+
+      item.appendChild(
+        deleteButton
+      );
+
+
+      recordingList.appendChild(
+        item
+      );
+
+    }
+
+
+    /* ============================================
+       Storage에 실제 영상이 하나도 없는 경우
+    ============================================ */
+
+    if (
+      recordingList.children.length === 0
+    ) {
+
+      recordingList.innerHTML =
+        "<p>📭 등록된 영상을 찾을 수 없습니다.</p>";
+
+    }
+
+  }
+
+  catch (error) {
+
+    console.error(
+      "암송 영상 목록 불러오기 오류:",
+      error
+    );
+
+
+    recordingList.innerHTML =
+      `
+      <p style="color:#e53935;">
+        ❌ 영상 목록을 불러오지 못했습니다.
+      </p>
+      `;
+
+  }
+
+}
+
+
+/* ==================================================
+   관리자 구절 저장
+================================================== */
+
+document
+  .getElementById("saveVerseButton")
+  .addEventListener(
+    "click",
+    async () => {
 
       const date =
         document
-          .getElementById(
-            "adminDate"
-          )
+          .getElementById("adminDate")
           .value;
 
 
       const reference =
         document
-          .getElementById(
-            "adminReference"
-          )
+          .getElementById("adminReference")
           .value
           .trim();
 
 
       const text =
         document
-          .getElementById(
-            "adminVerse"
-          )
+          .getElementById("adminVerse")
           .value
           .trim();
 
@@ -765,17 +1340,25 @@ document
             .from("verses")
             .upsert(
               {
-                week: date,
-                reference: reference,
-                text: text
+                week:
+                  date,
+
+                reference:
+                  reference,
+
+                text:
+                  text
               },
               {
-                onConflict: "week"
+                onConflict:
+                  "week"
               }
             );
 
 
-        if (result.error) {
+        if (
+          result.error
+        ) {
 
           throw result.error;
 
@@ -786,11 +1369,6 @@ document
           "✅ 온라인에 저장되었습니다.";
 
 
-        /*
-          저장한 뒤
-          Supabase에서 다시 불러오기
-        */
-
         await loadVerses();
 
 
@@ -798,22 +1376,24 @@ document
           .getElementById(
             "adminDate"
           )
-          .value = "";
+          .value =
+          "";
 
 
         document
           .getElementById(
             "adminReference"
           )
-          .value = "";
+          .value =
+          "";
 
 
         document
           .getElementById(
             "adminVerse"
           )
-          .value = "";
-
+          .value =
+          "";
 
       }
 
@@ -834,174 +1414,404 @@ document
   );
 
 
-/* =========================
-   녹음 기능
-========================= */
+/* ==================================================
+   동영상 촬영
+================================================== */
 
-let mediaRecorder;
-let audioChunks = [];
-let currentAudioBlob = null;
+let mediaRecorder =
+  null;
+
+let videoChunks =
+  [];
+
+let currentVideoBlob =
+  null;
+
+let cameraStream =
+  null;
+
+let videoMimeType =
+  "video/webm";
+
 
 const recordButton =
-  document.getElementById("recordButton");
+  document.getElementById(
+    "recordButton"
+  );
 
-const audio =
-  document.getElementById("audio");
+
+const video =
+  document.getElementById(
+    "video"
+  );
+
 
 const status =
-  document.getElementById("status");
+  document.getElementById(
+    "status"
+  );
+
 
 const completeButton =
-  document.getElementById("completeButton");
+  document.getElementById(
+    "completeButton"
+  );
+
 
 const completeMessage =
-  document.getElementById("completeMessage");
+  document.getElementById(
+    "completeMessage"
+  );
+
 
 const verseDisplay =
-  document.getElementById("verseDisplay");
+  document.getElementById(
+    "verseDisplay"
+  );
 
+
+/* ==================================================
+   동영상 녹화 시작 / 종료
+================================================== */
 
 recordButton.addEventListener(
   "click",
   async () => {
 
-    /* =========================
-       녹음 시작
-    ========================= */
+    /* ==============================================
+       녹화 시작
+    ============================================== */
 
     if (
       !mediaRecorder ||
-      mediaRecorder.state === "inactive"
+      mediaRecorder.state ===
+      "inactive"
     ) {
 
       try {
 
-        const stream =
-          await navigator.mediaDevices.getUserMedia({
-            audio: true
-          });
+        /* ==========================================
+           이름 확인
+        ========================================== */
+
+      const userName =
+  document
+    .getElementById(
+      "userName"
+    )
+    .value
+    .trim();
+
+
+if (!userName) {
+
+  alert(
+    "이름을 먼저 입력해주세요."
+  );
+
+  return;
+
+}
+
+
+
+        /* ==========================================
+           카메라 + 마이크
+        ========================================== */
+
+        cameraStream =
+          await navigator
+            .mediaDevices
+            .getUserMedia(
+              {
+                video: {
+                  facingMode:
+                    "user",
+
+                  width: {
+                    ideal:
+                      1280
+                  },
+
+                  height: {
+                    ideal:
+                      720
+                  }
+                },
+
+                audio:
+                  true
+              }
+            );
+
+
+        /* ==========================================
+           지원 형식 확인
+        ========================================== */
+
+        if (
+          MediaRecorder.isTypeSupported(
+            "video/webm;codecs=vp9,opus"
+          )
+        ) {
+
+          videoMimeType =
+            "video/webm;codecs=vp9,opus";
+
+        }
+
+        else if (
+          MediaRecorder.isTypeSupported(
+            "video/webm;codecs=vp8,opus"
+          )
+        ) {
+
+          videoMimeType =
+            "video/webm;codecs=vp8,opus";
+
+        }
+
+        else {
+
+          videoMimeType =
+            "video/webm";
+
+        }
+
+
+        /* ==========================================
+           MediaRecorder 생성
+        ========================================== */
 
         mediaRecorder =
-          new MediaRecorder(stream);
+          new MediaRecorder(
+            cameraStream,
+            {
+              mimeType:
+                videoMimeType
+            }
+          );
 
-        audioChunks = [];
+
+        videoChunks =
+          [];
+
+
+        /* ==========================================
+           카메라 화면 표시
+        ========================================== */
+
+        video.srcObject =
+          cameraStream;
+
+        video.muted =
+          true;
+
+        video.controls =
+          false;
+
+        video.style.display =
+          "block";
+
+
+        await video.play();
+
+
+        /* ==========================================
+           영상 데이터
+        ========================================== */
 
         mediaRecorder.ondataavailable =
           event => {
 
-            if (event.data.size > 0) {
-              audioChunks.push(event.data);
+            if (
+              event.data &&
+              event.data.size > 0
+            ) {
+
+              videoChunks.push(
+                event.data
+              );
+
             }
 
           };
 
 
+        /* ==========================================
+           녹화 종료
+        ========================================== */
+
         mediaRecorder.onstop =
           async () => {
 
-            /* 녹음 파일 만들기 */
-
-            currentAudioBlob =
+            currentVideoBlob =
               new Blob(
-                audioChunks,
+                videoChunks,
                 {
-                  type: "audio/webm"
+                  type:
+                    videoMimeType
                 }
               );
 
 
-            /* 브라우저에서 재생 */
+            /* ========================================
+               카메라 종료
+            ======================================== */
 
-            const audioURL =
+            if (
+              cameraStream
+            ) {
+
+              cameraStream
+                .getTracks()
+                .forEach(
+                  track => {
+
+                    track.stop();
+
+                  }
+                );
+
+            }
+
+
+            /* ========================================
+               녹화 영상 미리보기
+            ======================================== */
+
+            const videoURL =
               URL.createObjectURL(
-                currentAudioBlob
+                currentVideoBlob
               );
 
-            audio.src = audioURL;
 
+            video.srcObject =
+              null;
 
-            /* 마이크 종료 */
+            video.src =
+              videoURL;
 
-            stream.getTracks().forEach(
-              track => track.stop()
-            );
+            video.controls =
+              true;
+
+            video.muted =
+              false;
 
 
             status.textContent =
-              "☁️ 녹음 파일을 저장하는 중입니다...";
+              "☁️ 동영상 파일을 저장하는 중입니다...";
 
 
-            /* =========================
-               Supabase Storage 업로드
-            ========================= */
+            /* ========================================
+               Supabase 저장
+            ======================================== */
 
             try {
 
-              const userName =
-  document.getElementById("userName")
-    .value
-    .trim();
-
-const safeUserName =
-  userName.replace(
-    /[\\/:*?"<>|]/g,
-    "_"
-  );
-
-const fileName =
-  `recording_${Date.now()}.webm`;
+              const currentVerse =
+                getCurrentVerse();
 
 
-const filePath =
-  `recordings/${fileName}`;
+              const week =
+                currentVerse
+                  ? currentVerse.week
+                  : getToday();
 
 
-const uploadResult =
+              const fileName =
+                `recording_${Date.now()}.webm`;
+
+
+              /* ======================================
+                 Storage 업로드
+              ====================================== */
+
+              const uploadResult =
+                await supabaseClient
+                  .storage
+                  .from("recordings")
+                  .upload(
+                    fileName,
+                    currentVideoBlob,
+                    {
+                      contentType:
+                        "video/webm",
+
+                      upsert:
+                        false
+                    }
+                  );
+
+
+              if (
+                uploadResult.error
+              ) {
+
+                throw uploadResult.error;
+
+              }
+
+
+              /* ======================================
+                 recordings_logs 저장
+              ====================================== */
+
+             const logResult =
   await supabaseClient
-    .storage
-    .from("recordings")
-    .upload(
-      fileName,
-      currentAudioBlob,
+    .from("recordings_logs")
+    .insert(
       {
-        contentType:
-          "audio/webm",
-        upsert: false
+        user_name:
+          userName,
+
+        file_name:
+          fileName,
+
+        week:
+          week,
+
+        class_name:
+          className
       }
     );
 
 
-if (uploadResult.error) {
-  throw uploadResult.error;
-}
+
+              if (
+                logResult.error
+              ) {
+
+                throw logResult.error;
+
+              }
 
 
-console.log(
-  "녹음 업로드 성공:",
-  uploadResult.data
-);
+              console.log(
+                "동영상 저장 성공:",
+                fileName
+              );
 
 
               status.textContent =
-                "✅ 녹음이 저장되었습니다. 들어보고 암송 완료를 눌러주세요.";
+                "✅ 동영상이 저장되었습니다. 영상을 확인하고 암송 완료를 눌러주세요.";
 
 
               completeButton.disabled =
                 false;
-
 
             }
 
             catch (error) {
 
               console.error(
-                "녹음 업로드 오류:",
+                "동영상 저장 오류:",
                 error
               );
 
 
               status.textContent =
-                "❌ 녹음 저장에 실패했습니다.";
+                "❌ 동영상 저장에 실패했습니다. Supabase 설정을 확인해주세요.";
 
 
               completeButton.disabled =
@@ -1012,60 +1822,98 @@ console.log(
           };
 
 
+        /* ==========================================
+           녹화 시작
+        ========================================== */
+
         mediaRecorder.start();
 
 
-        /* 말씀 숨기기 */
+        /* ==========================================
+           말씀 숨기기
+        ========================================== */
 
-        document
-          .getElementById("verseDisplay")
-          .style.display = "none";
+        verseDisplay.style.display =
+          "none";
 
 
         recordButton.textContent =
-          "⏹️ 녹음 종료";
+          "⏹️ 동영상 녹화 종료";
 
 
         recordButton
           .classList
-          .add("recording");
+          .add(
+            "recording"
+          );
 
 
         status.textContent =
-          "🔴 녹음 중입니다. 암송해 주세요.";
+          "🔴 촬영 중입니다. 말씀을 암송해 주세요.";
 
       }
 
       catch (error) {
 
-        console.error(error);
+        console.error(
+          "카메라 시작 오류:",
+          error
+        );
 
-        status.textContent =
-          "⚠️ 마이크 사용 권한이 필요합니다.";
+
+        if (
+          error.name ===
+          "NotAllowedError"
+        ) {
+
+          status.textContent =
+            "⚠️ 카메라와 마이크 권한을 허용해주세요.";
+
+        }
+
+        else if (
+          error.name ===
+          "NotFoundError"
+        ) {
+
+          status.textContent =
+            "⚠️ 사용할 수 있는 카메라를 찾을 수 없습니다.";
+
+        }
+
+        else {
+
+          status.textContent =
+            "⚠️ 카메라를 시작할 수 없습니다.";
+
+        }
 
       }
 
     }
 
 
-    /* =========================
-       녹음 종료
-    ========================= */
+    /* ==============================================
+       녹화 종료
+    ============================================== */
 
     else if (
-      mediaRecorder.state === "recording"
+      mediaRecorder.state ===
+      "recording"
     ) {
 
       mediaRecorder.stop();
 
 
       recordButton.textContent =
-        "🎤 다시 녹음";
+        "🎥 다시 촬영";
 
 
       recordButton
         .classList
-        .remove("recording");
+        .remove(
+          "recording"
+        );
 
     }
 
@@ -1073,17 +1921,16 @@ console.log(
 );
 
 
-/* =========================
+/* ==================================================
    암송 완료
-========================= */
+================================================== */
 
 completeButton.addEventListener(
   "click",
   () => {
 
-    document
-      .getElementById("verseDisplay")
-      .style.display = "block";
+    verseDisplay.style.display =
+      "block";
 
 
     completeMessage.style.display =
@@ -1105,49 +1952,57 @@ completeButton.addEventListener(
 );
 
 
+/* ==================================================
+   앱 시작
+================================================== */
 
-/* =========================
-   암송 완료
-========================= */
-
-completeButton.addEventListener(
-  "click",
-  () => {
-
-document.getElementById("verseDisplay").style.display = "block";
+loadVerses();
 
 
-    completeMessage.style.display =
-      "block";
+/* ==================================================
+   Service Worker
+================================================== */
 
+if (
+  "serviceWorker" in navigator
+) {
 
-    completeButton.textContent =
-      "✅ 암송 완료됨";
+  window.addEventListener(
+    "load",
+    () => {
 
+      navigator.serviceWorker
+        .register(
+          "./service-worker.js"
+        )
 
-    completeButton.disabled =
-      true;
+        .then(
+          () => {
 
+            console.log(
+              "Service Worker 등록 완료"
+            );
 
-    status.textContent =
-      "이번 주 암송이 완료되었습니다!";
+          }
+        )
 
-  }
-);
+        .catch(
+          error => {
 
+            console.error(
+              "Service Worker 등록 실패:",
+              error
+            );
 
+          }
+        );
 
-    if ("serviceWorker" in navigator) {
-        window.addEventListener("load", () => {
-            navigator.serviceWorker.register("./service-worker.js")
-                .then(() => {
-                    console.log("Service Worker 등록 완료");
-                })
-                .catch(error => {
-                    console.error("Service Worker 등록 실패:", error);
-                });
-        });
     }
+  );
+
+}
+
 </script>
+
 </body>
 </html>
