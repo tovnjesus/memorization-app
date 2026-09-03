@@ -1875,12 +1875,12 @@ if (!userName) {
    recordings_logs 저장
 ====================================== */
 
-/* 사용자가 화면에서 선택한 반을 직접 가져옵니다 */
+/* 사용자가 선택한 반의 실제 문자열 값 */
 const selectedClass =
   document.getElementById("className").value;
 
 
-/* 반을 선택하지 않았으면 저장하지 않습니다 */
+/* 반을 선택하지 않은 경우 */
 if (!selectedClass) {
 
   throw new Error(
@@ -1915,9 +1915,7 @@ const logResult =
     });
 
 
-if (
-  logResult.error
-) {
+if (logResult.error) {
 
   throw logResult.error;
 
@@ -1939,12 +1937,15 @@ status.textContent =
 completeButton.disabled =
   false;
 
+          }
 
+        };
 
 
         /* ==========================================
            녹화 시작
         ========================================== */
+
 
         mediaRecorder.start();
 
