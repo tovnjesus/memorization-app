@@ -727,7 +727,6 @@ document
         return;
       }
 
-
       const password =
         prompt(
           "관리자 비밀번호를 입력하세요."
@@ -737,18 +736,17 @@ document
         return;
       }
 
-
       try {
+
+        /* ------------------------------------------
+           1. 관리자 로그인
+        ------------------------------------------ */
 
         const result =
           await supabaseClient.auth.signInWithPassword({
-            email:
-              email.trim(),
-
-            password:
-              password
+            email: email.trim(),
+            password: password
           });
-
 
         if (result.error) {
 
@@ -762,85 +760,161 @@ document
           );
 
           return;
-
         }
 
 
-const { data: roleData, error: roleError } =
-  await supabaseClient
-    .from("admin_roles")
-    .select("role")
-    .eq("user_id", result.data.user.id)
-    .maybeSingle();
+        /* ------------------------------------------
+           2. 관리자 역할 확인
+        ------------------------------------------ */
 
-console.log(
-  "관리자 권한 확인:",
-  roleData,
-  roleError
-);
+        const { data: roleData, error: roleError } =
+          await supabaseClient
+            .from("admin_roles")
+            .select("role")
+            .eq("user_id", result.data.user.id)
+            .maybeSingle();
 
-if (roleError) {
+        console.log(
+          "관리자 권한 확인:",
+          roleData,
+          roleError
+        );
 
-  console.error(
-    "관리자 권한 조회 오류:",
-    roleError
-  );
+        if (roleError) {
 
-  alert(
-    "❌ 관리자 권한을 확인할 수 없습니다.\n\n" +
-    roleError.message
-  );
+          console.error(
+            "관리자 권한 조회 오류:",
+            roleError
+          );
 
-  return;
+          alert(
+            "❌ 관리자 권한을 확인할 수 없습니다.\n\n" +
+            roleError.message
+          );
 
-}
+          await supabaseClient.auth.signOut();
 
-if (
-  !roleData ||
-  !roleData.role
-) {
+          return;
+        }
 
-  await supabaseClient.auth.signOut();
+        if (
+          !roleData ||
+          !roleData.role
+        ) {
 
-  alert(
-    "❌ 관리자 권한이 등록되지 않은 계정입니다."
-  );
+          await supabaseClient.auth.signOut();
 
-  return;
+          alert(
+            "❌ 관리자 권한이 등록되지 않은 계정입니다."
+          );
 
-}
-
-console.log(
-  "관리자 로그인 성공:",
-  roleData.role
-);
-
-document
-  .getElementById("adminPanel")
-  .style.display =
-  "block";
-
-document
-  .getElementById("logoutAdminButton")
-  .style.display =
-  "block";
-
-await loadRecordingList();
+          return;
+        }
 
 
-document
-  .getElementById("adminPanel")
-  .style.display =
-  "block";
+        /* ------------------------------------------
+           3. 담당 반 확인
+        ------------------------------------------ */
 
-document
-  .getElementById("logoutAdminButton")
-  .style.display =
-  "block";
+        let classNames = [];
 
-await loadRecordingList();
+        if (roleData.role === "super_admin") {
+
+          console.log(
+            "👑 슈퍼 어드민 로그인"
+          );
+
+        } else {
+
+          const {
+            data: classData,
+            error: classError
+          } =
+            await supabaseClient
+              .from("admin_classes")
+              .select("class_name")
+              .eq(
+                "user_id",
+                result.data.user.id
+              );
+
+          console.log(
+            "관리자 담당 반:",
+            classData,
+            classError
+          );
+
+          if (classError) {
+
+            console.error(
+              "담당 반 조회 오류:",
+              classError
+            );
+
+            alert(
+              "❌ 담당 반 정보를 확인할 수 없습니다.\n\n" +
+              classError.message
+            );
+
+            await supabaseClient.auth.signOut();
+
+            return;
+          }
+
+          classNames =
+            (classData || [])
+              .map(row => row.class_name)
+              .filter(Boolean);
+
+          if (classNames.length === 0) {
+
+            await supabaseClient.auth.signOut();
+
+            alert(
+              "❌ 담당 반이 등록되지 않은 관리자입니다."
+            );
+
+            return;
+          }
+        }
 
 
+        /* ------------------------------------------
+           4. 관리자 정보 저장
+        ------------------------------------------ */
+
+        window.currentAdmin = {
+          userId: result.data.user.id,
+          role: roleData.role,
+          classNames: classNames
+        };
+
+        console.log(
+          "관리자 로그인 성공:",
+          window.currentAdmin
+        );
+
+
+        /* ------------------------------------------
+           5. 관리자 화면 표시
+        ------------------------------------------ */
+
+        document
+          .getElementById("adminPanel")
+          .style.display =
+          "block";
+
+        document
+          .getElementById("logoutAdminButton")
+          .style.display =
+          "block";
+
+
+        /* ------------------------------------------
+           6. 녹음 목록 불러오기
+        ------------------------------------------ */
+
+        await loadRecordingList();
 
       }
 
@@ -913,16 +987,34 @@ document
 async function loadRecordingList() {
 
   const recordingList =
-    document.getElementById(
-      "recordingList"
-    );
-
+    document.getElementById("recordingList");
 
   recordingList.textContent =
     "☁️ 영상을 불러오는 중입니다...";
 
 
   try {
+
+    /* ==================================================
+       현재 로그인 관리자 정보 확인
+    ================================================== */
+
+    const currentAdmin =
+      window.currentAdmin;
+
+    if (!currentAdmin) {
+
+      recordingList.innerHTML =
+        "<p>❌ 관리자 정보를 확인할 수 없습니다.</p>";
+
+      return;
+
+    }
+
+
+    /* ==================================================
+       recordings_logs 조회
+    ================================================== */
 
     const result =
       await supabaseClient
@@ -943,17 +1035,47 @@ async function loadRecordingList() {
     }
 
 
-    const recordings =
-      result.data;
+    let recordings =
+      result.data || [];
 
+
+    /* ==================================================
+       관리자별 반 필터링
+
+       super_admin → 전체
+       admin       → 담당 반만
+    ================================================== */
 
     if (
-      !recordings ||
+      currentAdmin.role !== "super_admin"
+    ) {
+
+      const allowedClasses =
+        currentAdmin.classNames || [];
+
+
+      recordings =
+        recordings.filter(
+          recording =>
+            recording.class_name &&
+            allowedClasses.includes(
+              recording.class_name
+            )
+        );
+
+    }
+
+
+    /* ==================================================
+       영상이 없는 경우
+    ================================================== */
+
+    if (
       recordings.length === 0
     ) {
 
       recordingList.innerHTML =
-        "<p>📭 아직 등록된 암송 영상이 없습니다.</p>";
+        "<p>📭 담당 반의 암송 영상이 없습니다.</p>";
 
       return;
 
@@ -964,31 +1086,27 @@ async function loadRecordingList() {
       "";
 
 
-    /* ==============================================
+    /* ==================================================
        영상 목록
-    ============================================== */
+    ================================================== */
 
     for (
       const recording of recordings
     ) {
 
       const item =
-        document.createElement(
-          "div"
-        );
+        document.createElement("div");
 
       item.className =
         "recording-item";
 
 
-      /* ============================================
+      /* ==============================================
          이름
-      ============================================ */
+      ============================================== */
 
       const name =
-        document.createElement(
-          "div"
-        );
+        document.createElement("div");
 
       name.className =
         "recording-name";
@@ -1001,14 +1119,12 @@ async function loadRecordingList() {
         );
 
 
-      /* ============================================
+      /* ==============================================
          날짜
-      ============================================ */
+      ============================================== */
 
       const date =
-        document.createElement(
-          "div"
-        );
+        document.createElement("div");
 
       date.className =
         "recording-date";
@@ -1021,9 +1137,27 @@ async function loadRecordingList() {
         );
 
 
-      /* ============================================
+      /* ==============================================
+         담당 반 표시
+      ============================================== */
+
+      const classInfo =
+        document.createElement("div");
+
+      classInfo.className =
+        "recording-class";
+
+      classInfo.textContent =
+        "🏫 " +
+        (
+          recording.class_name ||
+          "-"
+        );
+
+
+      /* ==============================================
          Signed URL
-      ============================================ */
+      ============================================== */
 
       const signedResult =
         await supabaseClient
@@ -1035,17 +1169,13 @@ async function loadRecordingList() {
           );
 
 
-      /* ============================================
-         영상이 이미 삭제된 경우
-         
-         DB 기록은 남아 있지만 Storage 파일이
-         없는 경우입니다.
-         
-         오류 문구를 표시하지 않고
-         해당 기록만 건너뜁니다.
-      ============================================ */
+      /* ==============================================
+         Storage 파일이 없는 경우
+      ============================================== */
 
-      if (signedResult.error) {
+      if (
+        signedResult.error
+      ) {
 
         console.warn(
           "Storage에 영상이 없어 건너뜁니다:",
@@ -1057,14 +1187,12 @@ async function loadRecordingList() {
       }
 
 
-      /* ============================================
+      /* ==============================================
          영상
-      ============================================ */
+      ============================================== */
 
       const video =
-        document.createElement(
-          "video"
-        );
+        document.createElement("video");
 
       video.className =
         "recording-video";
@@ -1079,14 +1207,12 @@ async function loadRecordingList() {
         signedResult.data.signedUrl;
 
 
-      /* ============================================
+      /* ==============================================
          삭제 버튼
-      ============================================ */
+      ============================================== */
 
       const deleteButton =
-        document.createElement(
-          "button"
-        );
+        document.createElement("button");
 
       deleteButton.className =
         "delete-button";
@@ -1144,7 +1270,7 @@ async function loadRecordingList() {
 
 
             /* ====================================
-               recordings_logs 기록 삭제
+               DB 기록 삭제
             ==================================== */
 
             const deleteResult =
@@ -1183,7 +1309,7 @@ async function loadRecordingList() {
             ) {
 
               recordingList.innerHTML =
-                "<p>📭 아직 등록된 암송 영상이 없습니다.</p>";
+                "<p>📭 담당 반의 암송 영상이 없습니다.</p>";
 
             }
 
@@ -1205,7 +1331,8 @@ async function loadRecordingList() {
 
 
             alert(
-              "❌ 영상 삭제에 실패했습니다.\n\nSupabase 삭제 권한을 확인해주세요."
+              "❌ 영상 삭제에 실패했습니다.\n\n" +
+              error.message
             );
 
           }
@@ -1218,40 +1345,31 @@ async function loadRecordingList() {
          화면에 추가
       ========================================== */
 
-      item.appendChild(
-        name
-      );
+      item.appendChild(name);
 
-      item.appendChild(
-        date
-      );
+      item.appendChild(date);
 
-      item.appendChild(
-        video
-      );
+      item.appendChild(classInfo);
 
-      item.appendChild(
-        deleteButton
-      );
+      item.appendChild(video);
 
+      item.appendChild(deleteButton);
 
-      recordingList.appendChild(
-        item
-      );
+      recordingList.appendChild(item);
 
     }
 
 
-    /* ============================================
+    /* ==================================================
        Storage에 실제 영상이 하나도 없는 경우
-    ============================================ */
+    ================================================== */
 
     if (
       recordingList.children.length === 0
     ) {
 
       recordingList.innerHTML =
-        "<p>📭 등록된 영상을 찾을 수 없습니다.</p>";
+        "<p>📭 실제 저장된 암송 영상을 찾을 수 없습니다.</p>";
 
     }
 
