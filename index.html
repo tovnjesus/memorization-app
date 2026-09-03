@@ -1871,69 +1871,73 @@ if (!userName) {
               }
 
 
-              /* ======================================
-                 recordings_logs 저장
-              ====================================== */
+/* ======================================
+   recordings_logs 저장
+====================================== */
 
-             const logResult =
+/* 사용자가 화면에서 선택한 반을 직접 가져옵니다 */
+const selectedClass =
+  document.getElementById("className").value;
+
+
+/* 반을 선택하지 않았으면 저장하지 않습니다 */
+if (!selectedClass) {
+
+  throw new Error(
+    "반을 선택해주세요."
+  );
+
+}
+
+
+/* 선택된 반 확인 */
+console.log(
+  "선택한 반:",
+  selectedClass
+);
+
+
+const logResult =
   await supabaseClient
     .from("recordings_logs")
-    .insert(
-      {
-        user_name:
-          userName,
+    .insert({
+      user_name:
+        userName,
 
-        file_name:
-          fileName,
+      file_name:
+        fileName,
 
-        week:
-          week,
+      week:
+        week,
 
-        class_name:
-          className
-      }
-    );
+      class_name:
+        selectedClass
+    });
 
 
+if (
+  logResult.error
+) {
 
-              if (
-                logResult.error
-              ) {
+  throw logResult.error;
 
-                throw logResult.error;
-
-              }
-
-
-              console.log(
-                "동영상 저장 성공:",
-                fileName
-              );
+}
 
 
-              status.textContent =
-                "✅ 동영상이 저장되었습니다. 영상을 확인하고 암송 완료를 눌러주세요.";
+console.log(
+  "동영상 저장 성공:",
+  fileName,
+  "반:",
+  selectedClass
+);
 
 
-              completeButton.disabled =
-                false;
-
-            }
-
-            catch (error) {
-
-              console.error(
-                "동영상 저장 오류:",
-                error
-              );
+status.textContent =
+  "✅ 동영상이 저장되었습니다. 영상을 확인하고 암송 완료를 눌러주세요.";
 
 
-              status.textContent =
-                "❌ 동영상 저장에 실패했습니다. Supabase 설정을 확인해주세요.";
-
-
-              completeButton.disabled =
-                true;
+completeButton.disabled =
+  false;
 
             }
 
